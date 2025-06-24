@@ -181,5 +181,182 @@ data: {"type": "completed", "data": {...}, "session_id": "...", "timestamp": 123
 - ✅ 保持所有原有功能
 - ✅ 优化用户体验
 
+---
+
+# 📑 正式前端接口文档（API Reference）
+
+## 1. 智能体普通调用接口
+
+### POST `/agent/invoke`
+
+**描述**：同步调用智能体，等待完整回复后一次性返回。
+
+**请求参数（JSON）**：
+```json
+{
+  "user_id": "string",        // 用户唯一标识
+  "session_id": "string",     // 会话唯一标识
+  "query": "string",          // 用户输入内容
+  "system_message": "string"  // 可选，系统提示词
+}
+```
+
+**响应参数（JSON）**：
+```json
+{
+  "session_id": "string",
+  "status": "completed|interrupted|error",
+  "timestamp": 1234567890,
+  "message": "string",           // 错误时的提示
+  "result": { ... },             // 智能体完整回复（通常包含messages等结构）
+  "interrupt_data": { ... }      // 中断时的详细信息
+}
+```
+
+---
+
+## 2. 智能体流式调用接口
+
+### POST `/agent/invoke/stream`
+
+**描述**：流式调用智能体，采用Server-Sent Events (SSE)协议，前端可实时接收AI回复token、工具调用等事件。
+
+**请求参数（JSON）**：
+```json
+{
+  "user_id": "string",        // 用户唯一标识
+  "session_id": "string",     // 会话唯一标识
+  "query": "string",          // 用户输入内容
+  "system_message": "string"  // 可选，系统提示词
+}
+```
+
+**响应格式**：SSE流，每个事件以`data: {json}\n\n`格式推送。
+
+**流式块类型说明**：
+
+| type         | 说明                   | 主要字段         |
+|--------------|------------------------|------------------|
+| text_chunk   | AI文本token流          | content          |
+| tool_call    | 工具调用通知           | data.tool_calls  |
+| interrupt    | HIL中断                | interrupt_data   |
+| completed    | 执行完成，最终结果      | data             |
+| error        | 错误信息               | error_message    |
+
+**示例响应**：
+```
+data: {"type": "text_chunk", "content": "你好", "session_id": "...", "timestamp": 1234567890}
+
+data: {"type": "tool_call", "data": {"tool_calls": [...]}, "session_id": "...", "timestamp": 1234567890}
+
+data: {"type": "completed", "data": {...}, "session_id": "...", "timestamp": 1234567890}
+```
+
+---
+
+## 3. 会话与用户管理接口
+
+### 获取用户所有会话ID
+#### GET `/agent/sessionids/{user_id}`
+**响应**：
+```json
+{
+  "session_ids": ["session_id1", "session_id2", ...]
+}
+```
+
+### 获取当前活跃会话ID
+#### GET `/agent/active/sessionid/{user_id}`
+**响应**：
+```json
+{
+  "active_session_id": "string"
+}
+```
+
+### 查询会话状态
+#### GET `/agent/status/{user_id}/{session_id}`
+**响应**：
+```json
+{
+  "user_id": "string",
+  "session_id": "string",
+  "status": "not_found|idle|running|interrupted|completed|error",
+  "message": "string",
+  "last_query": "string",
+  "last_updated": 1234567890,
+  "last_response": { ... }
+}
+```
+
+### 删除会话
+#### DELETE `/agent/session/{user_id}/{session_id}`
+**响应**：
+```json
+{
+  "success": true
+}
+```
+
+---
+
+## 4. 长期记忆接口
+
+### 写入长期记忆
+#### POST `/agent/write/longterm`
+**请求**：
+```json
+{
+  "user_id": "string",
+  "memory_info": "string"
+}
+```
+**响应**：
+```json
+{
+  "success": true,
+  "user_id": "string",
+  "message": "string"
+}
+```
+
+---
+
+## 5. SSE流式前端集成建议
+
+- 建议使用EventSource（Web）、fetch+ReadableStream（现代Web）、或第三方SSE库监听`/agent/invoke/stream`接口。
+- 每收到一条`data: ...`，解析JSON，根据type字段动态渲染AI回复、工具调用、完成状态等。
+- 工具调用和中断事件可用于前端弹窗、进度条、HIL交互等。
+
+**前端伪代码示例**：
+```js
+const evtSource = new EventSource('/agent/invoke/stream', { withCredentials: true });
+evtSource.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  switch(data.type) {
+    case 'text_chunk':
+      // 实时追加AI回复
+      break;
+    case 'tool_call':
+      // 显示工具调用状态
+      break;
+    case 'completed':
+      // 回复结束，展示最终结果
+      break;
+    case 'interrupt':
+      // 处理HIL中断
+      break;
+    case 'error':
+      // 显示错误
+      break;
+  }
+};
+```
+
+---
+
+## 6. 错误处理
+- 所有接口均可能返回`error`类型或HTTP错误码，前端应做好异常捕获与友好提示。
+
 
 
