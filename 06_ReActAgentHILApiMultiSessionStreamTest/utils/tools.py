@@ -137,13 +137,13 @@ async def get_tools():
         """
         return f"成功预定了在{hotel_name}的住宿。"
 
-    @tool("generate_image", description="生成图像的工具")
+    @tool("generate_image", description="根据文本描述生成图像的工具，仅在用户明确要求生成、创建或制作图片、图像、画作时使用")
     async def generate_image(prompt: str):
         """
-        生成图像的工具
+        根据文本描述生成图像的工具，仅在用户明确要求生成、创建或制作图片、图像、画作时使用
         
         Args:
-            prompt: 图像生成的提示词
+            prompt: 图像生成的提示词，应该详细描述要生成的图像内容
             
         Returns:
             包含图像URL列表的结果
