@@ -137,6 +137,27 @@ async def get_tools():
         """
         return f"成功预定了在{hotel_name}的住宿。"
 
+    @tool("generate_image", description="生成图像的工具")
+    async def generate_image(prompt: str):
+        """
+        生成图像的工具
+        
+        Args:
+            prompt: 图像生成的提示词
+            
+        Returns:
+            包含图像URL列表的结果
+        """
+        # 调用实际的图像生成API
+        image_urls = ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]
+        
+        return {
+            "text": f"已生成{len(image_urls)}张图像",
+            "images": image_urls,
+            "type": "image_generation"
+        }
+
+
     # 自定义工具 计算两个数的乘积的工具
     @tool("multiply", description="计算两个数的乘积的工具")
     async def multiply(a: float, b: float) -> float:
@@ -163,12 +184,14 @@ async def get_tools():
     })
     # 从MCP Server中获取可提供使用的全部工具
     amap_tools = await client.get_tools()
+    print("所有工具:",amap_tools)
     # 为工具添加人工审查
     tools = [await add_human_in_the_loop(index) for index in amap_tools]
 
-    # 追加自定义工具并添加人工审查
-    tools.append(await add_human_in_the_loop(book_hotel))
-    tools.append(multiply)
+    # # 追加自定义工具并添加人工审查
+    # tools.append(await add_human_in_the_loop(book_hotel))
+    # tools.append(multiply)
+    # tools.append(generate_image)
 
     # 返回工具列表
     return tools

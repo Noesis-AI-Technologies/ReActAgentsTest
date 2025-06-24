@@ -17,6 +17,7 @@ import redis.asyncio as redis
 import json
 from datetime import timedelta, datetime
 from psycopg_pool import AsyncConnectionPool
+from psycopg.rows import dict_row
 from utils.config import Config
 from utils.llms import get_llm
 from utils.tools import get_tools
@@ -146,7 +147,7 @@ class RedisSessionManager:
     # 关闭 Redis 连接
     async def close(self):
         # 异步关闭 Redis 客户端连接
-        await self.redis_client.close()
+        await self.redis_client.aclose()
 
     # 创建指定用户的新会话
     # 存储结构：session:{user_id}:{session_id} = {
@@ -625,7 +626,7 @@ async def lifespan(app: FastAPI):
                 conninfo=Config.DB_URI,
                 min_size=Config.MIN_SIZE,
                 max_size=Config.MAX_SIZE,
-                kwargs={"autocommit": True, "prepare_threshold": 0}
+                kwargs={"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row}
         ) as pool:
             # 短期记忆 初始化checkpointer，并初始化表结构
             app.state.checkpointer = AsyncPostgresSaver(pool)

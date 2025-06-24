@@ -35,29 +35,29 @@ logger.addHandler(handler)
 # 模型配置字典
 MODEL_CONFIGS = {
     "openai": {
-        "base_url": "https://nangeai.top/v1",
-        "api_key": "sk-Gy2E8D7Jvm1GQ5CTCx830X8Ss2QKJyH43IF3ovpTuK0AR1FB8hOh",
+        "base_url": "https://api.openai-proxy.org/v1",
+        "api_key": "sk-EIqYo5d7Gz5fI9yFPaiv7PjwBRUNhCtbKvVDNT6knB0nz355",
         "chat_model": "gpt-4o-mini",
         "embedding_model": "text-embedding-3-small"
     },
-    "oneapi": {
-        "base_url": "http://139.224.72.218:3000/v1",
-        "api_key": "sk-GseYmJ8pX1D0I004W7a43506e8f1231234233C44B724FfD66aD9",
-        "chat_model": "qwen-max",
-        "embedding_model": "text-embedding-v1"
-    },
-    "qwen": {
-        "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-        "api_key": "sk-f718953877a84432436888b43b1bd8843026e2e5",
-        "chat_model": "qwen-turbo-latest",
-        "embedding_model": "text-embedding-v1"
-    },
-    "ollama": {
-        "base_url": "http://localhost:11434/v1",
-        "api_key": "ollama",
-        "chat_model": "llama3.1:8b",
-        "embedding_model": "nomic-embed-text:latest"
-    }
+    # "oneapi": {
+    #     "base_url": "http://139.224.72.218:3000/v1",
+    #     "api_key": "sk-GseYmJ8pX1D0I004W7a43506e8f1231234233C44B724FfD66aD9",
+    #     "chat_model": "qwen-max",
+    #     "embedding_model": "text-embedding-v1"
+    # },
+    # "qwen": {
+    #     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    #     "api_key": "sk-f718953877a84432436888b43b1bd8843026e2e5",
+    #     "chat_model": "qwen-turbo-latest",
+    #     "embedding_model": "text-embedding-v1"
+    # },
+    # "ollama": {
+    #     "base_url": "http://localhost:11434/v1",
+    #     "api_key": "ollama",
+    #     "chat_model": "llama3.1:8b",
+    #     "embedding_model": "nomic-embed-text:latest"
+    # }
 }
 
 

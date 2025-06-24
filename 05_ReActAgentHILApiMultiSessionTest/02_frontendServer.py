@@ -801,6 +801,18 @@ def main():
             continue
 
 
+# 在02_frontendServer.py中
+def display_agent_response(response_data):
+    if "images" in response_data.get("result", {}):
+        # 处理图像显示
+        images = response_data["result"]["images"]
+        console.print(f"[green]生成了{len(images)}张图像：[/green]")
+        for i, url in enumerate(images, 1):
+            console.print(f"  {i}. {url}")
+    else:
+        # 处理文本显示
+        console.print(response_data.get("result", {}).get("text", ""))
+
 
 if __name__ == "__main__":
     main()
